@@ -5,16 +5,23 @@ import java.util.Random;
 
 /**
  * Class that contains methods which realises elliptic curve arithmetic
+ *
  * @author Dermenzhy
  */
 
 public class EllipticArithmetic {
-    NumberAlgorithms numAlg = new NumberAlgorithms();
+    private NumberAlgorithms numAlg = new NumberAlgorithms();
 
     /**
      * @param n     - field characteristic
      * @param point - point on curve with  random coordinates(x,y)
      * @return new EllipticCurve object with random "a" parameter, over field modulo "n", and calculated param "b"
+     * generating "a" randomly in range from 0 to n-1
+     * calculating "b" as function dependent on coordinates of point [x,y] and value of "a"
+     * calculating curve discriminant g
+     * do this calculations while wont get params such that g!=n
+     * Throw exception if we found divisor in such way
+     * found divisor as gcd of discriminant of curve and composite n
      */
     public EllipticCurve generateCurve(BigInteger n, PointOnEC point) {
         Random rnd = new Random();
@@ -23,20 +30,10 @@ public class EllipticArithmetic {
         BigInteger g;
         BigInteger x = point.getX();
         BigInteger y = point.getY();
-        /**
-         * generating "a" randomly in range from 0 to n-1
-         * calculating "b" as function dependent on coordinates of point [x,y] and value of "a"
-         * calculating curve discriminant g
-         * do this calculations while wont get params such that g!=n
-         */
         do {
             a = new BigInteger(n.bitLength(), rnd);
             b = (((y.pow(2)).subtract(x.pow(3))).subtract(a.multiply(x))).mod(n);
             g = numAlg.gcd(((BigInteger.valueOf(4).multiply(a.pow(3))).add((BigInteger.valueOf(27)).multiply(b.pow(2)))), n);
-            /**
-             * Throw exception if we found divisor in such way
-             * found divisor as gcd of discriminant of curve and composite n
-             */
             if ((g.compareTo(BigInteger.valueOf(1))) > 0) {
 
                 System.out.println("Found divisor as gcd of discriminant of curve and composite n: " + g);
@@ -64,17 +61,14 @@ public class EllipticArithmetic {
      * @return new point that is the product of constant k multiply by point P (kP)
      * @throws ArithmeticException case when its impossible to find inverse element in chosen field modulo n actually
      *                             signalizes that we found divisor, in such case exception is threw
+     *                             in case if constant k equals 0, return point in infinity (point with coordinates [0,1,0]
+     *                             if k==1, return point as itself
      */
     public PointOnEC ellipticMultiply(EllipticCurve curve, int k, PointOnEC P) throws ArithmeticException {
-        /**
-         * in case if constant k equals 0, return point in infinity (point with coordinates [0,1,0]
-         */
+
         if (k == 0) {
             return new PointOnEC(BigInteger.valueOf(0), BigInteger.valueOf(1), BigInteger.valueOf(0));
         }
-        /**
-         * if k==1, return point as itself
-         */
         if (k == 1) {
             return P;
         }
@@ -82,18 +76,13 @@ public class EllipticArithmetic {
         BigInteger y = P.getY();
         BigInteger z = P.getZ();
         PointOnEC Q = new PointOnEC(x, y, z);
-        //m==3n
-        /**
-         * get the binary string from constant value to use additive-subtractive multiplying algorithm
-         */
+        // get the binary string from constant value to use additive-subtractive multiplying algorithm
         String binN = Integer.toBinaryString(k);
         String bin3N = Integer.toBinaryString((k * 3));
         while (binN.length() < bin3N.length()) {
             binN = "0" + binN;
         }
-        /**
-         * additive-subtractive multiplying algorithm, to multiply point by k
-         */
+        //additive-subtractive multiplying algorithm, to multiply point by k
         for (int j = 1; j < binN.length() - 1; j++) {
             Q = ellipticSum(curve, Q, Q);
             if ((Character.getNumericValue(binN.charAt(j))) == 0 && (Character.getNumericValue(bin3N.charAt(j)) == 1)) {
@@ -128,31 +117,25 @@ public class EllipticArithmetic {
         x2 = x2.mod(n);
         y2 = y2.mod(n);
         BigInteger m;
-        /**
-         * if one points have z coordinate equals 0, then it is the point at infinity, at such case just return another
-         * point as a result
-         */
+        // if one points have z coordinate equals 0, then it is the point at infinity, at such case just return another
+        // point as a result
         if (z1.equals(BigInteger.valueOf(0))) {
             return P2;
         }
         if (z2.equals(BigInteger.valueOf(0))) {
             return P2;
         }
-        /**
-         * d is part of curve angular coefficient formula, the mod inverse element in field modulo n of d gives an
-         * angular coefficient, due to elliptic curve arithmetic this mod inverse operation is not possible if d is
-         * divisor of n
-         */
+
+         /* d is part of curve angular coefficient formula, the mod inverse element in field modulo n of d gives an
+          angular coefficient, due to elliptic curve arithmetic this mod inverse operation is not possible if d is
+          divisor of n */
+
         BigInteger d;
-        /**
-         * there is two cases of elliptic sum, general sum of two different points, and specific case of doubling the
-         * same point
-         */
+        /* there is two cases of elliptic sum, general sum of two different points, and specific case of doubling the
+           same point */
         if (x1.equals(x2)) {
-            /**
-             * case when two points have same x coordinates and opposite y coordinates, means this points are inverse,
-             * thus their sum equals point on infinity
-             */
+            /* case when two points have same x coordinates and opposite y coordinates, means this points are inverse,
+              thus their sum equals point on infinity */
             if ((y1.add(y2)).equals(BigInteger.valueOf(0))) {
                 return new PointOnEC(BigInteger.valueOf(0), BigInteger.valueOf(1), BigInteger.valueOf(0));
             }
@@ -171,10 +154,8 @@ public class EllipticArithmetic {
             }
 
         }
-        /**
-         * if calculating of angular coefficient was successful, then calculate new point coordinates [x3, y3], which
-         * represents the sum of given two points
-         */
+        /* if calculating of angular coefficient was successful, then calculate new point coordinates [x3, y3], which
+         represents the sum of given two points */
         BigInteger x3;
         BigInteger y3;
         x3 = (m.pow(2)).subtract(x1).subtract(x2);

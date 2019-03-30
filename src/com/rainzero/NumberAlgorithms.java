@@ -5,10 +5,18 @@ import java.math.BigInteger;
 /**
  * Class that contents different number algorithms methods, which are general and can be used not only with elliptic
  * curves
+ *
  * @author Dermenzhy
  */
 public class NumberAlgorithms {
 
+    /**
+     * Method that finds greatest common divisor of two numbers
+     *
+     * @param a the first number
+     * @param b the second number
+     * @return greatest common divisor of two chosen numbers
+     */
     public BigInteger gcd(BigInteger a, BigInteger b) {
         BigInteger biZero = new BigInteger("0");
         if ((b.compareTo(biZero)) == 0) return a;
@@ -17,8 +25,9 @@ public class NumberAlgorithms {
     }
 
     /**
-     * Create a boolean array "prime[0..n]" and initialize all entries it as true. A value in prime[i] will
-     * finally be false if i is Not a prime, else true.
+     * @param n the primes boundary
+     * @return a boolean array "prime[0..n]" and initialize all entries it as true. A value in prime[i] will finally be
+     * false if i is Not a prime, else true.
      */
     public int[] sieveOfEratosthenes(int n) {
         boolean[] prime = new boolean[n + 1];

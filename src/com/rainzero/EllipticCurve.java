@@ -8,25 +8,16 @@ import java.math.BigInteger;
  * @author Dermenzhy
  */
 public class EllipticCurve {
-    /**
-     * Parameter "a" of curve equation y^2=x^3+a*x+b
-     */
     private BigInteger a;
-    /**
-     * Parameter "b" of curve equation y^2=x^3+a*x+b
-     */
     private BigInteger b;
-    /**
-     * Characteristic of the field modulo over which curve is constructed n (also the number that factorized)
-     */
     private BigInteger n;
 
     /**
      * Elliptic curve constructor
      *
-     * @param a parameter "a" of curve
-     * @param b parameter "b" of curve
-     * @param n field characteristic
+     * @param a parameter "a" of curve equation y^2=x^3+a*x+b
+     * @param b parameter "b" of curve equation y^2=x^3+a*x+b
+     * @param n field characteristic over which curve is constructed
      */
     public EllipticCurve(BigInteger a, BigInteger b, BigInteger n) {
         this.a = a;
