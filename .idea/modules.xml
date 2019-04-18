@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/ECM1.1.iml" filepath="$PROJECT_DIR$/ECM1.1.iml" />
+      <module fileurl="file://$PROJECT_DIR$/EllipticCurveMethod/EllipticCurveMethod.iml" filepath="$PROJECT_DIR$/EllipticCurveMethod/EllipticCurveMethod.iml" />
     </modules>
   </component>
 </project>

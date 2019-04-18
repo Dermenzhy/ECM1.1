@@ -1,5 +1,3 @@
-package com.rainzero;
-
 import java.math.BigInteger;
 
 /**

@@ -1,5 +1,3 @@
-package com.rainzero;
-
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,15 +16,14 @@ public class Main {
         NumberAlgorithms numAlg = new NumberAlgorithms();
         int[] sieve = numAlg.sieveOfEratosthenes(b1);
         resList.add(n);
-        /**
-         * TODO this method doesn't work properly. Requires to be fixed.
-         *
-         */
-        // fullFactorization(b1, lim, sieve);
+
+        //fullFactorization(b1, lim, sieve);
         ECM(b1, n, sieve);
 
     }
-
+    /*
+          TODO this method doesn't work properly. Requires to be fixed. Actually problem is particularly in other parts of code
+     */
     private static void fullFactorization(int b1, int lim, int[] sieve) {
         int compCounter = 1;
         while (compCounter > 0) {
@@ -60,29 +57,33 @@ public class Main {
 
     private static void ECM(int b1, BigInteger n, int[] sieve) {
         EllipticArithmetic ea = new EllipticArithmetic();
-        PointOnEC p = ea.generatePoint(n);
-        EllipticCurve ec = ea.generateCurve(n, p);
-        int alfa;
-        // System.out.println(Arrays.toString(sieve));
-        outerloop:
-        for (int prime : sieve) {
-            //System.out.println("Current prime is: " + prime);
-            alfa = 1;
-            while ((Math.pow(prime, alfa)) <= b1) {
-                alfa++;
-            }
-            alfa = alfa - 1;
-            //  System.out.println("Number is: " + prime);
-            //  System.out.println("And its grades: ");
-            for (int i = 0; i < alfa; i++) {
-                try {
-                    p = ea.ellipticMultiply(ec, prime, p);
-                } catch (ArithmeticException e) {
-                    System.out.println("Divisor was found: " + Main.resList.get(resList.size() - 1));
-                    break outerloop;
+        PointOnEC p = PointOnEC.generateRandomPoint(n);
+        try {
+            EllipticCurve ec = ea.generateCurve(n, p);
+            int alfa;
+            // System.out.println(Arrays.toString(sieve));
+            outerloop:
+            for (int prime : sieve) {
+                //System.out.println("Current prime is: " + prime);
+                alfa = 1;
+                while ((Math.pow(prime, alfa)) <= b1) {
+                    alfa++;
                 }
+                alfa = alfa - 1;
+                //  System.out.println("Number is: " + prime);
+                //  System.out.println("And its grades: ");
+                for (int i = 0; i < alfa; i++) {
+                    try {
+                        p = ea.ellipticMultiply(ec, prime, p);
+                    } catch (ArithmeticException e) {
+                        System.out.println("Divisor was found: " + Main.resList.get(resList.size() - 1));
+                        break outerloop;
+                    }
+                }
+                // System.out.print("\n");
             }
-            // System.out.print("\n");
+        } catch (GCDException e) {
+            return;
         }
     }
 

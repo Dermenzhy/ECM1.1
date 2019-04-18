@@ -1,5 +1,3 @@
-package com.rainzero;
-
 import java.math.BigInteger;
 import java.util.Random;
 
@@ -23,7 +21,7 @@ public class EllipticArithmetic {
      * Throw exception if we found divisor in such way
      * found divisor as gcd of discriminant of curve and composite n
      */
-    public EllipticCurve generateCurve(BigInteger n, PointOnEC point) {
+    public EllipticCurve generateCurve(BigInteger n, PointOnEC point) throws GCDException {
         Random rnd = new Random();
         BigInteger a;
         BigInteger b;
@@ -34,26 +32,18 @@ public class EllipticArithmetic {
             a = new BigInteger(n.bitLength(), rnd);
             b = (((y.pow(2)).subtract(x.pow(3))).subtract(a.multiply(x))).mod(n);
             g = numAlg.gcd(((BigInteger.valueOf(4).multiply(a.pow(3))).add((BigInteger.valueOf(27)).multiply(b.pow(2)))), n);
+            /*
+            TODO: test this exception
+             */
             if ((g.compareTo(BigInteger.valueOf(1))) > 0) {
-
                 System.out.println("Found divisor as gcd of discriminant of curve and composite n: " + g);
                 (Main.resList).add(g);
                 (Main.resList).remove(n);
-                return new EllipticCurve(a, b, n);
+                throw new GCDException("Found divisor as gcd of discriminant of curve and composite n", g, n);
             }
         } while (g.equals(n));
         return new EllipticCurve(a, b, n);
     }
-
-    /**
-     * @param n field characteristic
-     * @return new point generated over "n"-characteristic field
-     */
-    public PointOnEC generatePoint(BigInteger n) {
-        Random rnd = new Random();
-        return new PointOnEC(new BigInteger(n.bitLength(), rnd), new BigInteger(n.bitLength(), rnd), new BigInteger("1"));
-    }
-
     /**
      * @param curve curve on which multiplied point is
      * @param k     integer constant on which curve point is multiplied
@@ -125,11 +115,9 @@ public class EllipticArithmetic {
         if (z2.equals(BigInteger.valueOf(0))) {
             return P2;
         }
-
          /* d is part of curve angular coefficient formula, the mod inverse element in field modulo n of d gives an
           angular coefficient, due to elliptic curve arithmetic this mod inverse operation is not possible if d is
           divisor of n */
-
         BigInteger d;
         /* there is two cases of elliptic sum, general sum of two different points, and specific case of doubling the
            same point */
@@ -140,18 +128,10 @@ public class EllipticArithmetic {
                 return new PointOnEC(BigInteger.valueOf(0), BigInteger.valueOf(1), BigInteger.valueOf(0));
             }
             d = ((((BigInteger.valueOf(3)).multiply(x1.pow(2))).add(a)).multiply((BigInteger.valueOf(2)).multiply(y1)));
-            try {
-                m = calculateAngularCoefficient(n, d);
-            } catch (ArithmeticException e) {
-                throw e;
-            }
+            m = calculateAngularCoefficient(n, d);
         } else {
-            d = ((y2.subtract(y1)).multiply(x2.subtract(x1)));
-            try {
-                m = calculateAngularCoefficient(n, d);
-            } catch (ArithmeticException e) {
-                throw e;
-            }
+            d = y2.subtract(y1).multiply(x2.subtract(x1));
+            m = calculateAngularCoefficient(n, d);
 
         }
         /* if calculating of angular coefficient was successful, then calculate new point coordinates [x3, y3], which

@@ -1,5 +1,3 @@
-package com.rainzero;
-
 import java.math.BigInteger;
 
 /**
@@ -20,6 +18,9 @@ public class NumberAlgorithms {
     public BigInteger gcd(BigInteger a, BigInteger b) {
         BigInteger biZero = new BigInteger("0");
         if ((b.compareTo(biZero)) == 0) return a;
+        if(b.compareTo(biZero)<0){
+            b = b.negate();
+        }
         BigInteger x = a.mod(b);
         return gcd(b, x);
     }
@@ -30,6 +31,10 @@ public class NumberAlgorithms {
      * false if i is Not a prime, else true.
      */
     public int[] sieveOfEratosthenes(int n) {
+        if (n<2){
+            int [] sieve = {};
+            return  sieve;
+        }
         boolean[] prime = new boolean[n + 1];
         for (int i = 0; i < n + 1; i++)
             prime[i] = true;
