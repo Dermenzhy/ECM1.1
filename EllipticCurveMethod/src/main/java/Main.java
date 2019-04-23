@@ -10,19 +10,24 @@ public class Main {
     static List<BigInteger> resList = new ArrayList<>();
 
     public static void main(String[] args) {
-        int b1 = 500;
-        int lim = 1000;
-        BigInteger n = new BigInteger("123371273668");
+        int b1 = 2000;
+        final int C = b1 / 2;
+        int lim = 2000;
+        BigInteger n = new BigInteger("1331915742633769");
         NumberAlgorithms numAlg = new NumberAlgorithms();
         int[] sieve = numAlg.sieveOfEratosthenes(b1);
-        resList.add(n);
-
-        //fullFactorization(b1, lim, sieve);
-        ECM(b1, n, sieve);
-
     }
+
     /*
-          TODO this method doesn't work properly. Requires to be fixed. Actually problem is particularly in other parts of code
+     TODO this method doesn't work properly. Requires to be fixed. Actually problem is particularly in other parts of code also it is needed to be refactored with using of single factorization method
+     */
+
+    /**
+     * Method that should factorize number until we get all the prime divisors
+     *
+     * @param b1    boundary
+     * @param lim   limit of curves used after which boundary is increased
+     * @param sieve array of primes less than boundary b1 that are received as result of Eratosthenes algorithm
      */
     private static void fullFactorization(int b1, int lim, int[] sieve) {
         int compCounter = 1;
@@ -55,36 +60,82 @@ public class Main {
         }
     }
 
+    /**
+     * Method that performs single try of factorization by using elliptic curves
+     *
+     * @param b1    boundary
+     * @param n     the composite number to factorize
+     * @param sieve array of primes less than boundary b1 that are received as result of Eratosthenes algorithm
+     */
     private static void ECM(int b1, BigInteger n, int[] sieve) {
-        EllipticArithmetic ea = new EllipticArithmetic();
-        PointOnEC p = PointOnEC.generateRandomPoint(n);
         try {
+            EllipticArithmetic ea = new EllipticArithmetic();
+            PointOnEC p = PointOnEC.generateRandomPoint(n);
             EllipticCurve ec = ea.generateCurve(n, p);
             int alfa;
-            // System.out.println(Arrays.toString(sieve));
             outerloop:
             for (int prime : sieve) {
-                //System.out.println("Current prime is: " + prime);
                 alfa = 1;
                 while ((Math.pow(prime, alfa)) <= b1) {
                     alfa++;
                 }
                 alfa = alfa - 1;
-                //  System.out.println("Number is: " + prime);
-                //  System.out.println("And its grades: ");
                 for (int i = 0; i < alfa; i++) {
                     try {
                         p = ea.ellipticMultiply(ec, prime, p);
                     } catch (ArithmeticException e) {
-                        System.out.println("Divisor was found: " + Main.resList.get(resList.size() - 1));
                         break outerloop;
                     }
                 }
-                // System.out.print("\n");
             }
         } catch (GCDException e) {
             return;
         }
     }
 
+    /**
+     * @param b1    boundary
+     * @param n     the composite number to factorize
+     * @param sieve array of primes less than boundary b1 that are received as result of Eratosthenes algorithm
+     * @param C     the constant, which defines how should boundary be increased after each time when we go over the limit of curves
+     * @param lim   limit of curves used after which boundary is increased
+     */
+    public static void singleFactorization(int b1, BigInteger n, int[] sieve, int C, int lim) {
+        int counter = 0;
+        resList.clear();
+        resList.add(n);
+        while (resList.size() == 1) {
+            ECM(b1, n, sieve);
+            counter++;
+            if (counter > lim) {
+                b1 = C + b1;
+                counter = 0;
+            }
+        }
+    }
+    /* Some method that was used for particular research, shouldn't be very interesting for whoever else :D
+    public static void numberStructureResearch(int b1, int[] sieve, int C, int lim) {
+        BigInteger[] compArr = new BigInteger[50];
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader("results/input.txt"));
+            for (int i = 0; i < compArr.length; i++) {
+                String line = reader.readLine();
+                compArr[i] = new BigInteger(line);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        SaveToTxt st = new SaveToTxt("", "NumberResearch1-50");
+        for (int i = 0; i < 50; i++) {
+            for (int j = 0; j < 50; j++) {
+                long start = System.currentTimeMillis();
+                singleFactorization(b1, compArr[i], sieve, C, lim);
+                long timeSpent = System.currentTimeMillis() - start;
+                String resString = resList.get(0).toString() + "\t" + timeSpent + "\n";
+                st.save(resString);
+            }
+        }
+        st.close();
+    }
+    */
 }

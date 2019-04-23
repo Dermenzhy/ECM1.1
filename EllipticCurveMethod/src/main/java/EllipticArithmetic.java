@@ -36,7 +36,6 @@ public class EllipticArithmetic {
             TODO: test this exception
              */
             if ((g.compareTo(BigInteger.valueOf(1))) > 0) {
-                System.out.println("Found divisor as gcd of discriminant of curve and composite n: " + g);
                 (Main.resList).add(g);
                 (Main.resList).remove(n);
                 throw new GCDException("Found divisor as gcd of discriminant of curve and composite n", g, n);
@@ -44,6 +43,7 @@ public class EllipticArithmetic {
         } while (g.equals(n));
         return new EllipticCurve(a, b, n);
     }
+
     /**
      * @param curve curve on which multiplied point is
      * @param k     integer constant on which curve point is multiplied

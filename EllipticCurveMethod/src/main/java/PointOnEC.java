@@ -3,11 +3,12 @@ import java.util.Random;
 
 /**
  * Class that describes point in 3-dimension
+ *
  * @author Dermenzhy
  */
 public class PointOnEC {
     /**
-     * Point coordinates x,y,z
+     * Point with coordinates x,y,z
      */
     private BigInteger x;
     private BigInteger y;
@@ -30,6 +31,7 @@ public class PointOnEC {
         this.y = y;
         this.z = z;
     }
+
     /**
      * @param n field characteristic
      * @return new point generated over "n"-characteristic field
@@ -38,6 +40,7 @@ public class PointOnEC {
         Random rnd = new Random();
         return new PointOnEC(new BigInteger(n.bitLength(), rnd), new BigInteger(n.bitLength(), rnd), new BigInteger("1"));
     }
+
     @Override
     public String toString() {
         return "PointOnEC{" +
